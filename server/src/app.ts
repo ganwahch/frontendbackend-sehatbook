@@ -1,6 +1,5 @@
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
-import { env } from "./config/env";
 import { notFound, errorHandler } from "./middlewares/errorHandler";
 
 import authRoutes from "./routes/authRoutes";
@@ -12,15 +11,11 @@ import adminRoutes from "./routes/adminRoutes";
 export function createApp(): Application {
   const app = express();
 
+  // Reflect the request origin so the API works from any deployed frontend.
+  // Auth uses JWT in the Authorization header (not cookies), so this is safe.
   app.use(
     cors({
-      origin: (origin, callback) => {
-        // Allow non-browser clients (no origin) and any configured origin.
-        if (!origin || env.clientUrls.includes(origin)) {
-          return callback(null, true);
-        }
-        return callback(new Error(`Origin ${origin} not allowed by CORS`));
-      },
+      origin: true,
       credentials: true,
     })
   );
